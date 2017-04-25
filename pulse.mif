@@ -116,5 +116,3 @@ Specify Oxs_TimeDriver [subst {
 Destination my_archive mmArchive
 
 Schedule DataTable my_archive Step 1
-#Schedule "Oxs_TimeDriver::Simulation time" Step 1
-#Schedule "Oxs_TimeDriver::mz" Step 1
