@@ -22,7 +22,7 @@ set pwait [expr {$pwait*1e-9}]
 # K1 used in iteration
 Parameter K1_iter -4.5e3
 
-set outname [format "pulse_K1=%.0f" $K1_iter]
+set outname [format "./data/pulse_K1=%.0f" $K1_iter]
 
 # Compute exponential factor, in 1/sec^2.  Field formula is
 # pamp.exp(pfac.(t-pwait)^2), with t in seconds.
