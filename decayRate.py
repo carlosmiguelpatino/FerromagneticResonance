@@ -5,13 +5,14 @@ from scipy import signal
 from scipy.optimize import curve_fit
 import matplotlib.pylab as plt
 import numpy as np
+import seaborn
 
 
 initial_value = -4500
 end_value = -4500*1.2
-n_points  = 15
+n_points  = 50
 print('Simulating {0} k1 value points from {1} to {2}'.format(n_points, initial_value, end_value))
-k1Iteration(initial_value, end_value, n_points)
+#k1Iteration(initial_value, end_value, n_points)
 
 k1_values = np.linspace(initial_value, end_value, n_points)
 decay_rates = []
@@ -19,8 +20,10 @@ decay_rates = []
 def exponential(x, a, b):
     return a * np.exp(-b * x)
 
+showPlots = input('Show relaxation plots for each file? [y/n]:')
+
 for k1 in k1_values:
-    filename = 'pulse_K1={0:.0f}.csv'.format(k1)
+    filename = './data/pulse_K1={0:.0f}.csv'.format(k1)
     print('Processing file {0}'.format(filename))
     data = pd.read_csv(filename)
     data = data[[' Oxs_TimeDriver::Simulation time (s)', ' Oxs_TimeDriver::mz']]
@@ -41,12 +44,16 @@ for k1 in k1_values:
 
     popt, pcov = curve_fit(exponential, x_decay, decay)
 
-    x = np.linspace(0, 2e-9, 1000)
-    y = exponential(np.array(x), *popt)
-    plt.plot(x, y)
-    plt.plot(data['Time'], data['mz'])
-    plt.show()
+    if(showPlots == "y"):
+        x = np.linspace(data['Time'].iloc[0], data['Time'].iloc[-1], 1000)
+        y = exponential(np.array(x), *popt)
+        plt.plot(x, y)
+        plt.plot(data['Time'], data['mz'])
+        plt.show()
     decay_rates.append(popt[1])
 
 plt.plot(k1_values, decay_rates)
+plt.xlabel('K1')
+plt.ylabel('Relaxation constant')
+plt.title('Relaxation constant vs. K1')
 plt.show()
