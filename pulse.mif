@@ -20,19 +20,24 @@ set pamp [expr {$pamp*0.001/$mu0}]
 set pwait [expr {$pwait*1e-9}]
 
 # K1 used in iteration
-Parameter K1_iter -4.5e3
+Parameter K1_param -4.5e3
 
-set outname [format "./data/pulse_K1=%.0f" $K1_iter]
+#Sample sizes
+Parameter xsize 200e-9
+Parameter ysize 100e-9
+Parameter zsize 20e-9
+
+set outname [format "./data/pulse_xsize=%.0g" $xsize]
 
 # Compute exponential factor, in 1/sec^2.  Field formula is
 # pamp.exp(pfac.(t-pwait)^2), with t in seconds.
 set pfac [expr {-log(2.)/(($pwidth*0.5*1e-12)*($pwidth*0.5*1e-12))}]
 
-Specify Oxs_BoxAtlas:atlas {
-  xrange {0 200e-9}
-  yrange {0 100e-9}
-  zrange {0  20e-9}
-}
+Specify Oxs_BoxAtlas:atlas [subst {
+  xrange {0 $xsize}
+  yrange {0 $xsize}
+  zrange {0 $zsize}
+}]
 
 Specify Oxs_RectangularMesh:mesh [subst {
   cellsize {$cellsize $cellsize $cellsize}
@@ -40,7 +45,7 @@ Specify Oxs_RectangularMesh:mesh [subst {
 }]
 
 Specify Oxs_CubicAnisotropy [subst {
-  K1  $K1_iter
+  K1  $K1_param
   axis1 {1 0 0}
   axis2 {0 1 0}
 }]
@@ -89,8 +94,8 @@ Specify Oxs_TimeDriver [subst {
  basename $outname
  evolver :evolve
  comment {run for 5 ns total, with a stage event triggered every 0.2 ns
-          inside the first ns, and then every 0.05 ns for the next 4 ns.}
- stopping_time {{0.2e-9 5} {0.05e-9 80} :expand:}
+          inside the first ns, and then every 0.0 ns for the next 4 ns.}
+ stopping_time {{1e-11 1000} :expand:}
  mesh :mesh
  Ms 800e3
  m0 { 1 0.02 0.01 }
