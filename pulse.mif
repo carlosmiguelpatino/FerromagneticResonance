@@ -27,7 +27,7 @@ Parameter xsize 200e-9
 Parameter ysize 100e-9
 Parameter zsize 20e-9
 
-set outname [format "./data/pulse_xsize=%.0g" $xsize]
+set outname [format "./data/pulse_xsize=%.02g" $xsize]
 
 # Compute exponential factor, in 1/sec^2.  Field formula is
 # pamp.exp(pfac.(t-pwait)^2), with t in seconds.
@@ -95,7 +95,7 @@ Specify Oxs_TimeDriver [subst {
  evolver :evolve
  comment {run for 5 ns total, with a stage event triggered every 0.2 ns
           inside the first ns, and then every 0.0 ns for the next 4 ns.}
- stopping_time {{1e-11 1000} :expand:}
+ stopping_time {{1e-11 500} :expand:}
  mesh :mesh
  Ms 800e3
  m0 { 1 0.02 0.01 }
