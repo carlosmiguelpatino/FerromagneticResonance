@@ -27,19 +27,29 @@ def importData(filename):
     data1 = pd.read_csv(filename)
     data1 = data1[[' Oxs_TimeDriver::Simulation time (s)', ' Oxs_TimeDriver::mx', ' Oxs_TimeDriver::my', ' Oxs_TimeDriver::mz']]
     data1.columns = ['Time', 'mx', 'my', 'mz']
-    subprocess.call('rm ./data/*.odt', shell=True)
+
+    if(type(data1['Time'][0]) == str):
+        data1['Time'] = data1['Time'].str.strip()
+        data1['mx'] = data1['mx'].str.strip()
+        data1['my'] = data1['my'].str.strip()
+        data1['mz'] = data1['mz'].str.strip()
+        data1['Time'] = pd.to_numeric(data1['Time'], errors='coerce')
+        data1['mx'] = pd.to_numeric(data1['mx'], errors='coerce')
+        data1['my'] = pd.to_numeric(data1['my'], errors='coerce')
+        data1['mz'] = pd.to_numeric(data1['mz'], errors='coerce')
+        data1 = data1.dropna()
 
     return data1
 
 from scipy.fftpack import fft, fftfreq
 
 def createFourierTransform(dataFrame):
-    dt = data1['Time'][1] - data1['Time'][0]
-    n = len(data1['mz'])
+    dt = dataFrame['Time'][1] - dataFrame['Time'][0]
+    n = len(dataFrame['mz'])
 
-    mx_fft = fft(data1['mx'])/n
-    my_fft = fft(data1['my'])/n
-    mz_fft = fft(data1['mz'])/n
+    mx_fft = abs(fft(dataFrame['mx']))/n
+    my_fft = abs(fft(dataFrame['my']))/n
+    mz_fft = abs(fft(dataFrame['mz']))/n
     freq = fftfreq(n, dt)
 
     return freq, mx_fft, my_fft, mz_fft
@@ -62,3 +72,31 @@ def analyzeRelaxationTime(data, magnetizationAxis):
     popt, pcov = curve_fit(exponential, x_decay, decay)
 
     return popt[1]
+
+import matplotlib.pylab as plt
+
+def plotFourierTransforms(frequencies, fourierTransforms, plottedAxis, showSave):
+    fig = plt.figure()
+    for key in frequencies:
+        plt.plot(frequencies[key], fourierTransforms[key], label=key)
+    plt.title('{} Fourier Transform'.format(plottedAxis))
+    plt.xlabel('Frequencies')
+    plt.ylabel('Fourier Transform')
+    plt.legend()
+    if(showSave == 'show'):
+        plt.show()
+    if(showSave == 'save'):
+        fig.savefig('{}FourierTransform.png'.format(plottedAxis), dpi=fig.dpi)
+
+def plotMagnetizations(dataFrames, plottedAxis, showSave):
+    fig = plt.figure()
+    for key, data in dataFrames.items():
+        plt.plot(data['Time'], data[plottedAxis], label = key)
+    plt.title('{} vs Time'.format(plottedAxis))
+    plt.xlabel('Time (s)')
+    plt.ylabel('{}'.format(plottedAxis))
+    plt.legend()
+    if(showSave == 'show'):
+        plt.show()
+    if(showSave == 'save'):
+        fig.savefig('{}.png'.format(plottedAxis), dpi=fig.dpi)
