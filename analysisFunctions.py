@@ -52,6 +52,13 @@ def createFourierTransform(dataFrame):
     mz_fft = abs(fft(dataFrame['mz']))/n
     freq = fftfreq(n, dt)
 
+
+    mask = freq > 0
+    freq = freq[mask]
+    mx_fft = mx_fft[mask]
+    my_fft = my_fft[mask]
+    mz_fft = mz_fft[mask]
+
     return freq, mx_fft, my_fft, mz_fft
 
 from scipy import signal
@@ -74,11 +81,12 @@ def analyzeRelaxationTime(data, magnetizationAxis):
     return popt[1]
 
 import matplotlib.pylab as plt
+plt.style.use('ggplot')
 
 def plotFourierTransforms(frequencies, fourierTransforms, plottedAxis, showSave):
     fig = plt.figure()
     for key in frequencies:
-        plt.plot(frequencies[key], fourierTransforms[key], label=key)
+        plt.plot(frequencies[key], fourierTransforms[key], label=key, alpha=0.5)
     plt.title('{} Fourier Transform'.format(plottedAxis))
     plt.xlabel('Frequencies')
     plt.ylabel('Fourier Transform')
@@ -91,7 +99,7 @@ def plotFourierTransforms(frequencies, fourierTransforms, plottedAxis, showSave)
 def plotMagnetizations(dataFrames, plottedAxis, showSave):
     fig = plt.figure()
     for key, data in dataFrames.items():
-        plt.plot(data['Time'], data[plottedAxis], label = key)
+        plt.plot(data['Time'], data[plottedAxis], label = key, alpha=0.5)
     plt.title('{} vs Time'.format(plottedAxis))
     plt.xlabel('Time (s)')
     plt.ylabel('{}'.format(plottedAxis))
