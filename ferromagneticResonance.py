@@ -1,4 +1,4 @@
-from analysisFunctions import variableIteration, importData, createFourierTransform, plotFourierTransforms, plotMagnetizations
+from analysisFunctions import variableIteration, importData, createFourierTransform, plotFourierTransforms, plotMagnetizations, plotFrequencyDependence
 
 import seaborn
 import numpy as np
@@ -38,10 +38,12 @@ for variableValue in variableValues:
     mz_transfroms[variableValue] = mz_fft
 
 showSave = input('Show or save plots [show/save]: ')
-plotMagnetizations(dataFrames, 'mx', showSave)
-plotMagnetizations(dataFrames, 'my', showSave)
-plotMagnetizations(dataFrames, 'mz', showSave)
+# plotMagnetizations(dataFrames, 'mx', showSave)
+# plotMagnetizations(dataFrames, 'my', showSave)
+# plotMagnetizations(dataFrames, 'mz', showSave)
+#
+# plotFourierTransforms(frequencies, mx_transfroms, 'mx', showSave)
+# plotFourierTransforms(frequencies, my_transfroms, 'my', showSave)
+# plotFourierTransforms(frequencies, mz_transfroms, 'mz', showSave)
 
-plotFourierTransforms(frequencies, mx_transfroms, 'mx', showSave)
-plotFourierTransforms(frequencies, my_transfroms, 'my', showSave)
-plotFourierTransforms(frequencies, mz_transfroms, 'mz', showSave)
+plotFrequencyDependence(frequencies, mz_transfroms, variableName, showSave)

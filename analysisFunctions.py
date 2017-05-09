@@ -108,3 +108,22 @@ def plotMagnetizations(dataFrames, plottedAxis, showSave):
         plt.show()
     if(showSave == 'save'):
         fig.savefig('{}.png'.format(plottedAxis), dpi=fig.dpi)
+
+def plotFrequencyDependence(frequencies, fourierTransforms, variableName, showSave):
+    max_freqs = []
+    values = []
+    for key in frequencies:
+        freq = frequencies[key]
+        fft = fourierTransforms[key]
+        max_freqs.append(freq[fft.argmax()])
+        values.append(key)
+
+    fig = plt.figure()
+    plt.plot(values, max_freqs, 'o')
+    plt.title('Dominant Frequency vs {}'.format(variableName))
+    plt.xlabel('{}'.format(variableName))
+    plt.ylabel('Dominant Frequency')
+    if(showSave == 'show'):
+        plt.show()
+    if(showSave == 'save'):
+        fig.savefig('{}.png'.format(plottedAxis), dpi=fig.dpi)
