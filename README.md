@@ -29,4 +29,6 @@ Once the variable is set as a parameter in the .mif file:
 3. Specify the initial and end values.
 4. Specify how many are required in the simulations between the initial and end values.
 
-Once these parameters are set, the script will simulate all the variables values specified using the command `tclsh oommf_path boxsi -parameters "parameterName parameterValue" oommfScript.mif` 
+Once these parameters are set, the script will simulate all the variables values specified using the command `tclsh oommf_path boxsi -parameters "parameterName parameterValue" oommfScript.mif`
+
+For details in the function implemented in the script, visit the jupyter notebook included in this repository. 
