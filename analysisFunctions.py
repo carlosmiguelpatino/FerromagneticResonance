@@ -7,18 +7,17 @@ def variableIteration(variableName, variableValues):
     path_oommf = '/home/carlosmiguelpatino/Software/oommf/oommf.tcl'
 
     # the name of the mif file
-    mif_file = os.path.abspath('/home/carlosmiguelpatino/Documents/FerromagneticResonance/pulse.mif')
+    mif_file = os.path.abspath('/home/carlosmiguelpatino/Documents/FerromagneticResonance/test150.mif')
 
     # make our list of sizes that we will loop through
     # in nm as our mif file converts to metres.
 
     for variableValue in variableValues:
-        oommf_string = 'tclsh {0} boxsi -parameters "{1} {2:.2g}" {3}'.format(path_oommf, variableName, variableValue, mif_file)
-        output_file_name = 'pulse_{0}={1:.2g}'.format(variableName, variableValue)
-        odt_to_csv = 'tclsh {0} odtcols -t csv <./data/{1}.odt >./data/{1}.csv'.format(path_oommf, output_file_name)
+        oommf_string = 'tclsh {0} boxsi -parameters "{1} {2:0.0f}" {3}'.format(path_oommf, variableName, variableValue, mif_file)
+        output_file_name = 'pulse_{0}={1:0.0f}'.format(variableName, variableValue)
+        odt_to_csv = 'tclsh {0} odtcols -m NA -t csv <./data/{1}.odt >./data/{1}.csv'.format(path_oommf, output_file_name)
         subprocess.call(oommf_string, shell=True)
         subprocess.call(odt_to_csv, shell=True)
-        subprocess.call('rm ./data/*.odt', shell=True)
 
 import pandas as pd
 
@@ -29,6 +28,7 @@ def importData(filename):
     data1.columns = ['Time', 'mx', 'my', 'mz']
 
     if(type(data1['Time'][0]) == str):
+        print('Converting to strings')
         data1['Time'] = data1['Time'].str.strip()
         data1['mx'] = data1['mx'].str.strip()
         data1['my'] = data1['my'].str.strip()
@@ -38,6 +38,7 @@ def importData(filename):
         data1['my'] = pd.to_numeric(data1['my'], errors='coerce')
         data1['mz'] = pd.to_numeric(data1['mz'], errors='coerce')
         data1 = data1.dropna()
+        data1 = data1.fillna(data1.mean())
 
     return data1
 
@@ -94,7 +95,7 @@ def plotFourierTransforms(frequencies, fourierTransforms, plottedAxis, showSave)
     if(showSave == 'show'):
         plt.show()
     if(showSave == 'save'):
-        fig.savefig('{}FourierTransform.png'.format(plottedAxis), dpi=fig.dpi)
+        fig.savefig('./plots/{}FourierTransform.png'.format(plottedAxis), dpi=fig.dpi)
 
 def plotMagnetizations(dataFrames, plottedAxis, showSave):
     fig = plt.figure()
@@ -107,7 +108,7 @@ def plotMagnetizations(dataFrames, plottedAxis, showSave):
     if(showSave == 'show'):
         plt.show()
     if(showSave == 'save'):
-        fig.savefig('{}.png'.format(plottedAxis), dpi=fig.dpi)
+        fig.savefig('./plots/{}.png'.format(plottedAxis), dpi=fig.dpi)
 
 def plotFrequencyDependence(frequencies, fourierTransforms, variableName, showSave):
     max_freqs = []
@@ -123,7 +124,15 @@ def plotFrequencyDependence(frequencies, fourierTransforms, variableName, showSa
     plt.title('Dominant Frequency vs {}'.format(variableName))
     plt.xlabel('{}'.format(variableName))
     plt.ylabel('Dominant Frequency')
+    xticks, xticklabels = plt.xticks()
+    # shift half a step to the left
+    # x0 - (x1 - x0) / 2 = (3 * x0 - x1) / 2
+    xmin = (3*xticks[0] - xticks[1])/2.
+    # shaft half a step to the right
+    xmax = (3*xticks[-1] - xticks[-2])/2.
+    plt.xlim(xmin, xmax)
+    plt.xticks(xticks)
     if(showSave == 'show'):
         plt.show()
     if(showSave == 'save'):
-        fig.savefig('{}.png'.format(plottedAxis), dpi=fig.dpi)
+        fig.savefig('./plots/{}.png'.format(plottedAxis), dpi=fig.dpi)
